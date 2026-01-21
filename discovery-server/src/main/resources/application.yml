@@ -1,0 +1,31 @@
+# 服务注册中心配置
+server:
+  port: 8761
+
+# Eureka服务器配置
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+  # 服务器配置
+  server:
+    enable-self-preservation: true
+    eviction-interval-timer-in-ms: 60000
+
+# 应用信息
+spring:
+  application:
+    name: discovery-server
+
+# 健康检查端点（用于监控）
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

@@ -1,0 +1,7 @@
+# 测试环境配置
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    wait-time-in-ms-when-sync-empty: 0  # 测试环境下快速启动
