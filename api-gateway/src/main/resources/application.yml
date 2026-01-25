@@ -1,0 +1,68 @@
+# API Gateway配置
+server:
+  port: 8080
+
+# Spring配置
+spring:
+  application:
+    name: api-gateway
+
+  # 强制使用响应式Web（Spring Cloud Gateway需要）
+  main:
+    web-application-type: reactive
+
+  # Cloud Gateway配置
+  cloud:
+    gateway:
+      # 服务发现配置
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      routes:
+        # 路由1：用户服务
+        - id: user-service-route
+#          uri: http://localhost:8081
+          uri: lb://user-service  # lb = load balancer
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - AddRequestHeader=X-Gateway-Route, user-service
+            - AddResponseHeader=X-Gateway-Processed, true
+            # - StripPrefix=1
+
+        # 路由2：Eureka控制台
+        - id: eureka-console-route
+          uri: http://localhost:8761
+          predicates:
+            - Path=/eureka,/eureka/**
+          filters:
+            - AddRequestHeader=X-Gateway-Route, eureka-console
+            - AddResponseHeader=X-Gateway-Processed, true
+            - RewritePath=/eureka/?(?<remaining>.*), /${remaining}
+
+        # 路由3：测试端点
+        - id: test-endpoint
+          uri: http://localhost:8081  # 指向用户服务
+          predicates:
+            - Path=/test,/ping,/health
+          filters:
+            - SetPath=/api/users  # 重定向到用户列表
+            - AddResponseHeader=Content-Type, text/plain
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+  instance:
+    instance-id: ${spring.application.name}:${server.port}
+
+# 日志配置
+logging:
+  level:
+    com.collabdoc.gateway: INFO
+    org.springframework.cloud.gateway: INFO
