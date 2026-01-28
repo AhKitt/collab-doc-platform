@@ -1,4 +1,3 @@
-// 创建文件：src/main/java/com/collabdoc/gateway/controller/DebugController.java
 package com.collabdoc.gateway.controller;
 
 import org.springframework.context.annotation.Bean;
